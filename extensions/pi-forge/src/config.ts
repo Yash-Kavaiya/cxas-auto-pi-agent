@@ -61,5 +61,12 @@ export function routeFor(
   phase: string,
   overrides: Record<string, string>,
 ): string {
-  return overrides[phase] ?? config.routing.policy[phase] ?? config.routing.policy.fallback;
+  // Final literal keeps the return type `string` under noUncheckedIndexedAccess;
+  // it equals DEFAULT_CONFIG's fallback so behaviour is unchanged when a config is present.
+  return (
+    overrides[phase] ??
+    config.routing.policy[phase] ??
+    config.routing.policy.fallback ??
+    "openai/gpt-4o"
+  );
 }
