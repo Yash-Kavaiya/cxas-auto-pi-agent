@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { initState, saveState, loadState } from "../src/state.js";
@@ -101,16 +101,20 @@ describe("forge_gate", () => {
 });
 
 describe("forge_note / forge_metric / forge_route", () => {
-  it("notes a decision", async () => {
+  it("notes a decision (and persists it to decisions.md)", async () => {
     const { ctx } = fakeCtx(root, "tui");
     await tool("forge_note").execute("id", { text: "decided X" }, undefined, undefined, ctx);
+    const md = readFileSync(join(root, ".pi-forge", "decisions.md"), "utf8");
+    expect(md).toContain("decided X");
     expect(loadState(root)).toBeTruthy(); // state intact
   });
-  it("writes a metric", async () => {
+  it("writes a metric (and persists/merges it to metrics.json)", async () => {
     const { ctx } = fakeCtx(root, "tui");
     await tool("forge_metric").execute("id", { key: "test", value: { passRate: 1 } }, undefined, undefined, ctx);
-    const r = await tool("forge_metric").execute("id", { key: "test", value: { passRate: 1 } }, undefined, undefined, ctx);
+    const r = await tool("forge_metric").execute("id", { key: "eval", value: { scorecard: 0.9 } }, undefined, undefined, ctx);
     expect(r.isError).toBeUndefined();
+    const metrics = JSON.parse(readFileSync(join(root, ".pi-forge", "metrics.json"), "utf8"));
+    expect(metrics).toEqual({ test: { passRate: 1 }, eval: { scorecard: 0.9 } });
   });
   it("routes a phase to the policy model", async () => {
     const { ctx } = fakeCtx(root, "tui");
