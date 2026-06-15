@@ -38,6 +38,14 @@ Expected:
 - `gates.G1.status` = approved, `gates.G2.verdict` = approve, `gates.G3.status` = approved
 - `.pi-forge/checkpoints/` contains numbered snapshots
 - `git log` shows the `forge: advance …` commits
+- `.pi-forge/artifacts/` contains: `brief.md`/`brief.json` (clarify), `plan.md` (build),
+  `test-report.md` (test), `scorecard.md` (evaluate); and on an iterate loop, `backlog.md`.
+- `state.json` `artifacts` map has pointers registered via forge_artifact.
+
+> Since #2, the orchestrator dispatches the real phase skills: the **requirements-clarifier**
+> asks batched questions during Clarify and writes the brief; **project-planner** then
+> **tdd-builder** run in Build; **tester**, **evaluator**, and **improver** run their phases.
+> (Deliver is still a stub until #6.)
 
 ## Gate-block proof (negative test)
 Start a fresh `sandbox/toy2`, `/forge-new X`, advance to `clarify`, then ask the agent to advance
