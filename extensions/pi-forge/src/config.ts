@@ -11,6 +11,7 @@ export interface ForgeConfig {
   channels: ChannelConfig;
   routing: { policy: Record<string, string> };
   bounds: { maxIterations: number; gateTimeoutHours: number };
+  cxas: { binPath: string };
 }
 
 export const DEFAULT_CONFIG: ForgeConfig = {
@@ -33,6 +34,7 @@ export const DEFAULT_CONFIG: ForgeConfig = {
     },
   },
   bounds: { maxIterations: 3, gateTimeoutHours: 72 },
+  cxas: { binPath: "cxas" },
 };
 
 function configPath(root: string): string {
@@ -49,6 +51,7 @@ export function loadConfig(root: string): ForgeConfig {
       policy: { ...DEFAULT_CONFIG.routing.policy, ...(raw.routing?.policy ?? {}) },
     },
     bounds: { ...DEFAULT_CONFIG.bounds, ...(raw.bounds ?? {}) },
+    cxas: { ...DEFAULT_CONFIG.cxas, ...(raw.cxas ?? {}) },
   };
 }
 

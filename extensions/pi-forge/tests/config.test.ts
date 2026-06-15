@@ -44,3 +44,15 @@ describe("routeFor", () => {
     expect(routeFor(DEFAULT_CONFIG, "nonexistent-phase", {})).toBe(DEFAULT_CONFIG.routing.policy.fallback);
   });
 });
+
+describe("cxas config", () => {
+  it("defaults binPath to 'cxas'", () => {
+    expect(DEFAULT_CONFIG.cxas.binPath).toBe("cxas");
+    expect(loadConfig(root).cxas.binPath).toBe("cxas");
+  });
+  it("merges an override", () => {
+    mkdirSync(join(root, ".pi-forge"), { recursive: true });
+    writeFileSync(join(root, ".pi-forge", "config.json"), JSON.stringify({ cxas: { binPath: "/opt/cxas" } }));
+    expect(loadConfig(root).cxas.binPath).toBe("/opt/cxas");
+  });
+});
