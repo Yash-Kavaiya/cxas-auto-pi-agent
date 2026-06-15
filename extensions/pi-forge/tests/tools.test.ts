@@ -130,3 +130,12 @@ describe("forge_note / forge_metric / forge_route", () => {
     expect(firstText(r)).toContain("claude-opus-4-8");
   });
 });
+
+describe("forge_artifact", () => {
+  it("registers an artifact pointer in state", async () => {
+    const { ctx } = fakeCtx(root, "tui");
+    const r = await tool("forge_artifact").execute("id", { key: "brief", path: "artifacts/brief.md" }, undefined, undefined, ctx);
+    expect(r.isError).toBeUndefined();
+    expect(loadState(root).artifacts).toEqual({ brief: "artifacts/brief.md" });
+  });
+});

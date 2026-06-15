@@ -1,5 +1,5 @@
 import { Type } from "typebox";
-import { loadState, saveState } from "./state.js";
+import { loadState, saveState, setArtifact } from "./state.js";
 import { canAdvance, advance } from "./machine.js";
 import { recordGateDecision, markGatePending } from "./gates.js";
 import { writeCheckpoint } from "./checkpoint.js";
@@ -176,6 +176,20 @@ export function buildForgeTools(deps: ForgeToolDeps): ForgeToolDef[] {
         const config = loadConfig(ctx.cwd);
         const model = routeFor(config, params.phase as string, state.routing.overrides);
         return text(model);
+      },
+    },
+    {
+      name: "forge_artifact",
+      description: "Register an artifact pointer (key -> path) in state.artifacts.",
+      parameters: Type.Object({
+        key: Type.String({ description: "Artifact key, e.g. 'brief' or 'plan'." }),
+        path: Type.String({ description: "Repo-relative path, e.g. 'artifacts/brief.md'." }),
+      }),
+      async execute(_id, params, _s, _u, ctx) {
+        const state = loadState(ctx.cwd);
+        const next = setArtifact(state, params.key as string, params.path as string);
+        saveState(ctx.cwd, next);
+        return text(`Artifact '${params.key}' registered -> ${params.path}`);
       },
     },
   ];
