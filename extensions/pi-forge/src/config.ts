@@ -44,7 +44,14 @@ function configPath(root: string): string {
 export function loadConfig(root: string): ForgeConfig {
   const path = configPath(root);
   if (!existsSync(path)) return DEFAULT_CONFIG;
-  const raw = JSON.parse(readFileSync(path, "utf8")) as Partial<ForgeConfig>;
+  let raw: Partial<ForgeConfig>;
+  try {
+    raw = JSON.parse(readFileSync(path, "utf8")) as Partial<ForgeConfig>;
+  } catch {
+    // A malformed config must not crash every tool call (loadConfig backs forge_route,
+    // forge_status, forge_cxas, …); fall back to defaults.
+    return DEFAULT_CONFIG;
+  }
   return {
     channels: { ...DEFAULT_CONFIG.channels, ...(raw.channels ?? {}) },
     routing: {

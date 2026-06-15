@@ -55,4 +55,9 @@ describe("cxas config", () => {
     writeFileSync(join(root, ".pi-forge", "config.json"), JSON.stringify({ cxas: { binPath: "/opt/cxas" } }));
     expect(loadConfig(root).cxas.binPath).toBe("/opt/cxas");
   });
+  it("falls back to defaults on malformed config.json", () => {
+    mkdirSync(join(root, ".pi-forge"), { recursive: true });
+    writeFileSync(join(root, ".pi-forge", "config.json"), "{ not valid json,,,");
+    expect(loadConfig(root)).toEqual(DEFAULT_CONFIG);
+  });
 });

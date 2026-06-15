@@ -4,7 +4,7 @@ import { recordGateDecision } from "./src/gates.js";
 import { clearInbox } from "./src/inbox.js";
 import { guardToolCall } from "./src/guard.js";
 import { buildForgeTools } from "./src/tools.js";
-import { buildCxasTool, type CxasRun } from "./src/cxas.js";
+import { buildCxasTool, runCxasBinary } from "./src/cxas.js";
 import { terminalChannel } from "./src/notifier.js";
 import { existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -45,21 +45,8 @@ export default function (pi: ExtensionAPI) {
     pi.registerTool({ label: tool.name, ...tool } as Parameters<typeof pi.registerTool>[0]);
   }
 
-  // CXAS bridge: run the cxas binary, capturing stdout/stderr/exit code.
-  const cxasRun = (bin: string, args: string[]): CxasRun => {
-    try {
-      const stdout = execFileSync(bin, args, { encoding: "utf8" });
-      return { stdout, stderr: "", exitCode: 0 };
-    } catch (err) {
-      const e = err as { stdout?: Buffer | string; stderr?: Buffer | string; status?: number; message?: string };
-      return {
-        stdout: e.stdout?.toString() ?? "",
-        stderr: e.stderr?.toString() ?? e.message ?? String(err),
-        exitCode: typeof e.status === "number" ? e.status : 1,
-      };
-    }
-  };
-  const cxasTool = buildCxasTool({ run: cxasRun });
+  // CXAS bridge: register forge_cxas backed by the real (bounded) binary runner.
+  const cxasTool = buildCxasTool({ run: runCxasBinary });
   pi.registerTool({ label: cxasTool.name, ...cxasTool } as Parameters<typeof pi.registerTool>[0]);
 
   // 3. Operator commands.

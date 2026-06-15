@@ -16,8 +16,8 @@ Run the project's tests and report results. General path only (CXAS evals are ha
 
 ## CXAS path (when project.type = cxas)
 Use the cxas-wrapper skill / forge_cxas:
-- Offline structural lint: `forge_cxas lint --app-dir <dir> --json`; record error/warning counts.
-- Deployed eval (if an app is deployed): `forge_cxas run --app-name <resource> --wait` (exit 0 pass / 1 fail).
+- Offline structural lint: call `forge_cxas` with `subcommand: "lint", args: ["--app-dir", "<dir>", "--json"]`; record error/warning counts.
+- Deployed eval (if an app is deployed): call `forge_cxas` with `subcommand: "run", args: ["--app-name", "<resource>", "--wait"]` (exit 0 pass / 1 fail).
 Fold both into `artifacts/test-report.md` and `forge_metric test {"cxas": {"lint": {...}, "eval": {...}}}`.
 
 ## Rules

@@ -115,7 +115,9 @@ docs/RUNBOOK-pi-forge.md         (CXAS section)
 | Risk | Mitigation |
 |---|---|
 | Model runs raw `cxas` via shell, bypassing the allow-list | `cxas-wrapper` skill mandates `forge_cxas`; (the allow-list can't stop a raw Bash call, but the skill + the structured tool make it the path of least resistance). |
-| Destructive `delete` | Gated behind explicit `allowDelete: true`. |
+| Destructive `delete` / write ops (`push`, `create`) | `delete` requires explicit `allowDelete: true` (a non-default opt-in) — the v1 guard. These are not yet *state-backed gate* enforced; full human-gating of destructive GCP mutations is deferred to **#6** (deploy gating). The cxas-wrapper skill mandates explicit human approval. |
+| `binPath` runs an arbitrary binary | `binPath` is **operator-controlled config** (trusted), not model input; the allow-list guards the model-controlled subcommand/args. Consistent with §12 (local-first, single operator). Not validated by design — validation would break the legitimate Go-binary override. |
+| Subprocess hangs / floods memory | `runCxasBinary` bounds every call with a 5-min `timeout` and a 50 MB `maxBuffer`. |
 | CI lacks the cxas binary | Integration test `skipIf`s; unit tests use a mock runner. |
 | Python CLI output isn't JSON | `parseCxasResult` returns `json: null` and preserves raw stdout; skills read exitCode + text. |
 | Token/credential handling | Out of scope — delegated to `--oauth-token`/env/ADC; pi-forge stores no secrets. |

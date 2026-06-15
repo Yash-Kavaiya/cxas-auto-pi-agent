@@ -1,4 +1,5 @@
 import { Type } from "typebox";
+import { execFileSync } from "node:child_process";
 import { loadConfig } from "./config.js";
 import type { ForgeToolDef } from "./tools.js";
 
@@ -71,6 +72,8 @@ export function buildCxasTool(deps: CxasToolDeps): ForgeToolDef {
       if (!gate.ok) {
         return { content: [{ type: "text", text: `Blocked: ${gate.reason}` }], isError: true };
       }
+      // binPath is operator-controlled config (trusted), not model input. The allow-list
+      // guards the model-controlled subcommand/args; the binary itself is the operator's choice.
       const binPath = loadConfig(ctx.cwd).cxas.binPath;
       const run = await deps.run(binPath, [subcommand, ...args]);
       const result = parseCxasResult(run.stdout, run.stderr, run.exitCode);
@@ -83,4 +86,28 @@ export function buildCxasTool(deps: CxasToolDeps): ForgeToolDef {
       };
     },
   };
+}
+
+/**
+ * Runs the cxas binary synchronously, capturing stdout/stderr/exit code as a CxasRun.
+ * Bounded by a timeout (deployed evals are slow but must never hang the agent forever)
+ * and a generous maxBuffer (eval/trace output can be large). Shared by the extension
+ * wiring and the integration test so behaviour stays identical.
+ */
+export function runCxasBinary(bin: string, args: string[]): CxasRun {
+  try {
+    const stdout = execFileSync(bin, args, {
+      encoding: "utf8",
+      timeout: 5 * 60 * 1000,
+      maxBuffer: 50 * 1024 * 1024,
+    });
+    return { stdout, stderr: "", exitCode: 0 };
+  } catch (err) {
+    const e = err as { stdout?: Buffer | string; stderr?: Buffer | string; status?: number; message?: string };
+    return {
+      stdout: e.stdout?.toString() ?? "",
+      stderr: e.stderr?.toString() ?? e.message ?? String(err),
+      exitCode: typeof e.status === "number" ? e.status : 1,
+    };
+  }
 }
