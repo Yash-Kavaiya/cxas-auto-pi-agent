@@ -17,7 +17,7 @@ const ALLOWED_FORGE_TOOLS = new Set([
 export function lintSkill(expectedName: string, content: string): string[] {
   const problems: string[] = [];
 
-  const fm = content.match(/^---\n([\s\S]*?)\n---/);
+  const fm = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!fm) {
     problems.push("missing YAML frontmatter");
     return problems;

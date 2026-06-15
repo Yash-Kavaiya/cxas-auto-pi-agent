@@ -15,6 +15,9 @@ describe("lintSkill", () => {
   it("passes a well-formed skill", () => {
     expect(lintSkill("demo-skill", good)).toEqual([]);
   });
+  it("passes a well-formed skill with CRLF line endings", () => {
+    expect(lintSkill("demo-skill", good.replace(/\n/g, "\r\n"))).toEqual([]);
+  });
   it("flags missing frontmatter", () => {
     expect(lintSkill("x", "# no frontmatter")).toContain("missing YAML frontmatter");
   });
