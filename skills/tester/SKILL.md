@@ -14,6 +14,12 @@ Run the project's tests and report results. General path only (CXAS evals are ha
 4. Register the report: `forge_artifact test_report artifacts/test-report.md`.
 5. Return control to the orchestrator (which advances to Evaluate). Do not advance yourself.
 
+## CXAS path (when project.type = cxas)
+Use the cxas-wrapper skill / forge_cxas:
+- Offline structural lint: `forge_cxas lint --app-dir <dir> --json`; record error/warning counts.
+- Deployed eval (if an app is deployed): `forge_cxas run --app-name <resource> --wait` (exit 0 pass / 1 fail).
+Fold both into `artifacts/test-report.md` and `forge_metric test {"cxas": {"lint": {...}, "eval": {...}}}`.
+
 ## Rules
 - Report failures honestly with the real output; do not claim green without evidence.
 - If a layer doesn't exist for this project, say so in the report rather than fabricating it.

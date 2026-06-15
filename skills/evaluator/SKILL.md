@@ -14,6 +14,9 @@ Make a holistic judgment of the work. The output recommendation informs the huma
 4. Record it: `forge_metric eval {"recommendation": "approve|iterate", "summary": "<one line>"}` and `forge_artifact scorecard artifacts/scorecard.md`.
 5. Return control to the orchestrator, which opens **G2** (forge_gate, select). The human's verdict — guided by your recommendation — routes to deliver (approve) or improve (iterate). Do not advance yourself.
 
+## CXAS path (when project.type = cxas)
+Incorporate the cxas lint findings (rule severities) and the `cxas run` eval pass/fail (from the test report / metrics) into the holistic judgment and the approve|iterate recommendation.
+
 ## Rules
 - Be specific and honest: tie every judgment to evidence in the brief, the report, or the code.
 - The recommendation is advisory; the human's G2 verdict is authoritative.

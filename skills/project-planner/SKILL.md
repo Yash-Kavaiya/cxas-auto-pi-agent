@@ -14,6 +14,9 @@ Turn the approved brief into an executable plan. Run before tdd-builder. Drive t
 4. Record any significant design decision with `forge_note`.
 5. Return control to the orchestrator (which will run tdd-builder next). Do not advance the phase yourself.
 
+## CXAS path (when project.type = cxas)
+Plan the app as CX Agent Studio resources: agents (instructions), tools/toolsets, guardrails, and evaluations. Use the cxas lint rule categories (config, callbacks, tools, evals, structure, schema) as quality targets the build must satisfy.
+
 ## Rules
 - The brief owns *what/why*; the plan owns *how*. Don't re-litigate requirements — if the brief is ambiguous, note it and proceed with a stated assumption.
 - Keep modules small and independently testable.
