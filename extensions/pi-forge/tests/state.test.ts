@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { forgeDir, statePath, initState, loadState, saveState } from "../src/state.js";
+import { forgeDir, statePath, initState, loadState, saveState, setArtifact } from "../src/state.js";
 
 let root: string;
 const fixedNow = () => "2026-06-14T18:00:00.000Z";
@@ -44,11 +44,15 @@ describe("save/load round-trip", () => {
 });
 
 describe("setArtifact", () => {
-  it("registers an artifact pointer immutably", async () => {
-    const { setArtifact } = await import("../src/state.js");
+  it("registers an artifact pointer immutably", () => {
     const s = initState({ name: "T" }, fixedNow);
     const next = setArtifact(s, "brief", "artifacts/brief.md");
     expect(s.artifacts).toEqual({}); // original unchanged
     expect(next.artifacts).toEqual({ brief: "artifacts/brief.md" });
+  });
+  it("overwrites an existing key", () => {
+    const s = setArtifact(initState({ name: "T" }, fixedNow), "brief", "artifacts/old.md");
+    const next = setArtifact(s, "brief", "artifacts/new.md");
+    expect(next.artifacts).toEqual({ brief: "artifacts/new.md" });
   });
 });
