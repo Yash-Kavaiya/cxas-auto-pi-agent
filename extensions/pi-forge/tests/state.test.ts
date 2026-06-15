@@ -42,3 +42,13 @@ describe("save/load round-trip", () => {
     expect(() => loadState(root)).toThrow(/no pi-forge state/i);
   });
 });
+
+describe("setArtifact", () => {
+  it("registers an artifact pointer immutably", async () => {
+    const { setArtifact } = await import("../src/state.js");
+    const s = initState({ name: "T" }, fixedNow);
+    const next = setArtifact(s, "brief", "artifacts/brief.md");
+    expect(s.artifacts).toEqual({}); // original unchanged
+    expect(next.artifacts).toEqual({ brief: "artifacts/brief.md" });
+  });
+});

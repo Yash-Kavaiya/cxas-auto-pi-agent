@@ -57,3 +57,9 @@ export function loadState(root: string): ForgeState {
   }
   return JSON.parse(readFileSync(path, "utf8")) as ForgeState;
 }
+
+export function setArtifact(state: ForgeState, key: string, path: string): ForgeState {
+  const next = structuredClone(state);
+  next.artifacts[key] = path;
+  return next;
+}
