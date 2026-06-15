@@ -7,6 +7,7 @@ const ALLOWED_FORGE_TOOLS = new Set([
   "forge_metric",
   "forge_route",
   "forge_artifact",
+  "forge_cxas",
 ]);
 
 /**

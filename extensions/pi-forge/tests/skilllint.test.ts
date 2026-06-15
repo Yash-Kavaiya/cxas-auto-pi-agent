@@ -42,4 +42,8 @@ describe("lintSkill", () => {
     const c = `---\nname: demo-skill\ndescription: ok\n---\n\nwrite artifacts/../secret`;
     expect(lintSkill("demo-skill", c).some((p) => /artifact path/.test(p))).toBe(true);
   });
+  it("allows the forge_cxas tool reference", () => {
+    const c = `---\nname: demo-skill\ndescription: ok\n---\n\nuse forge_cxas to lint`;
+    expect(lintSkill("demo-skill", c)).toEqual([]);
+  });
 });
