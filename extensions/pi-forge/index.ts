@@ -6,6 +6,7 @@ import { guardToolCall } from "./src/guard.js";
 import { buildForgeTools } from "./src/tools.js";
 import { terminalChannel } from "./src/notifier.js";
 import { existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import type { GateId, Verdict } from "./src/types.js";
 
 export default function (pi: ExtensionAPI) {
@@ -23,8 +24,15 @@ export default function (pi: ExtensionAPI) {
   // 2. Register the forge_* tools.
   const deps = {
     git: (msg: string) => {
-      void pi.exec("git", ["add", "-A"]);
-      void pi.exec("git", ["commit", "-m", msg]);
+      // Synchronous + ordered so the commit always captures what advance/checkpoint
+      // just wrote on disk (the "every advance = a commit" audit trail). Best-effort:
+      // a git failure (e.g. not a repo, nothing to commit) must not abort a phase.
+      try {
+        execFileSync("git", ["add", "-A"], { stdio: "ignore" });
+        execFileSync("git", ["commit", "-m", msg], { stdio: "ignore" });
+      } catch (err) {
+        process.stderr.write(`[pi-forge] git commit skipped: ${(err as Error).message}\n`);
+      }
     },
     channels: [terminalChannel()],
   };
