@@ -51,3 +51,12 @@ Expected:
 Start a fresh `sandbox/toy2`, `/forge-new X`, advance to `clarify`, then ask the agent to advance
 straight to `build` WITHOUT approving G1. The `forge_advance` tool call must be **blocked** with
 "gate G1 not approved". This is the core guarantee.
+
+## CXAS bridge (project.type = cxas)
+- Offline smoke (no GCP): in a CXAS app dir, the agent runs `forge_cxas lint --app-dir . --json`;
+  `forge_cxas lint --list-rules` lists rule ids. Verify the tool returns `{exitCode, json}` and
+  rejects non-allow-listed subcommands.
+- Deployed eval (needs a GCP project + `gcloud auth` / `CXAS_OAUTH_TOKEN`): the tester runs
+  `forge_cxas run --app-name projects/{p}/locations/{l}/apps/{a} --wait`.
+- Set `config.cxas.binPath` if `cxas` is not the intended binary on PATH (PATH `cxas` is the
+  Python build; the Go binary lives at `cxas-scrapi-go/bin/cxas.exe`).
