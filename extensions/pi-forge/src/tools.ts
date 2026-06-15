@@ -23,7 +23,7 @@ export interface ForgeCtx {
   hasUI: boolean;
   ui: {
     confirm(title: string, message: string): Promise<boolean>;
-    select(title: string, items: string[]): Promise<string | null>;
+    select(title: string, items: string[]): Promise<string | null | undefined>;
     notify(message: string, type: string): void;
   };
 }
@@ -105,8 +105,15 @@ export function buildForgeTools(deps: ForgeToolDeps): ForgeToolDef[] {
 
         if (ctx.mode === "tui" && ctx.hasUI) {
           if (kind === "select") {
-            const choice = (await ctx.ui.select(`Gate ${id}`, ["approve", "iterate"])) as Verdict | null;
-            const verdict: Verdict = choice === "iterate" ? "iterate" : "approve";
+            const choice = await ctx.ui.select(`Gate ${id}`, ["approve", "iterate"]);
+            // A dismissed/cancelled dialog must NOT count as approval — leave the gate pending.
+            if (choice !== "approve" && choice !== "iterate") {
+              const pending = markGatePending(state, id, now);
+              saveState(ctx.cwd, pending);
+              writeInbox(ctx.cwd, id, summary, now);
+              return text(`Gate ${id} not decided (dialog dismissed); still pending. Resolve with: /forge-approve ${id} approve|iterate`);
+            }
+            const verdict: Verdict = choice;
             const next = recordGateDecision(state, id, { status: "approved", verdict, channel: "terminal" }, now);
             saveState(ctx.cwd, next);
             clearInbox(ctx.cwd, id);

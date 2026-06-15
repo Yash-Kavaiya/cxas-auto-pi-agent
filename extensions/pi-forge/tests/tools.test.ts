@@ -98,6 +98,14 @@ describe("forge_gate", () => {
     expect(firstText(r)).toMatch(/forge-approve G1/);
     expect(loadState(root).gates.G1.status).toBe("pending");
   });
+  it("leaves a select gate pending when the dialog is dismissed", async () => {
+    saveState(root, { ...loadState(root), phase: { current: "evaluate", status: "in_progress", enteredAt: fixedNow() } });
+    const { ctx } = fakeCtx(root, "tui", { selectReturn: null });
+    const r = await tool("forge_gate").execute("id", { id: "G2", summary: "Verdict?", kind: "select" }, undefined, undefined, ctx);
+    expect(firstText(r)).toMatch(/pending/i);
+    expect(loadState(root).gates.G2.status).toBe("pending");
+    expect(loadState(root).gates.G2.verdict).toBeUndefined();
+  });
 });
 
 describe("forge_note / forge_metric / forge_route", () => {

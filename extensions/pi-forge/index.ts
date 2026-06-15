@@ -7,6 +7,7 @@ import { buildForgeTools } from "./src/tools.js";
 import { terminalChannel } from "./src/notifier.js";
 import { existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { GATE_IDS } from "./src/types.js";
 import type { GateId, Verdict } from "./src/types.js";
 
 export default function (pi: ExtensionAPI) {
@@ -76,6 +77,10 @@ export default function (pi: ExtensionAPI) {
       const note = rest.join(" ") || undefined;
       if (!gate || !decision) {
         ctx.ui.notify("Usage: /forge-approve <G1|G2|G3> <approve|reject|iterate> [note]", "warning");
+        return;
+      }
+      if (!GATE_IDS.includes(gate as GateId)) {
+        ctx.ui.notify(`Unknown gate '${gate}'. Use one of: ${GATE_IDS.join(", ")}.`, "warning");
         return;
       }
       const id = gate as GateId;
