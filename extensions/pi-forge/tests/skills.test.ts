@@ -14,6 +14,7 @@ const skillNames = readdirSync(skillsDir).filter((d) =>
 describe("skill conformance", () => {
   it("includes all expected skills", () => {
     expect(skillNames.sort()).toEqual([
+      "cxas-wrapper",
       "evaluator",
       "improver",
       "project-orchestrator",
